@@ -12,24 +12,25 @@ public class EnemyBase : MonoBehaviour
 {
 
     bool testFlag = false;
-    StateMachine<E_EnemyStateMachineStates> stateMachine;
+    StateMachine<E_EnemyStateMachineStates, MyGameStateData> stateMachine;
     // Start is called before the first frame update
     void Start()
     {
-
-        stateMachine = new StateMachine<E_EnemyStateMachineStates>(
+        var stateData = new MyGameStateData(
+            this.gameObject, new GameObject(), "hello"
+        );
+        
+        stateMachine = new StateMachine<E_EnemyStateMachineStates, MyGameStateData>(
             E_EnemyStateMachineStates.Idle,
-            new StateDataInjection(
-                this.gameObject, 
-                new GameObject() // TODO: Replace this
-            )
+            stateData
         );
 
-        stateMachine.SetAvailableStates(new List<State>{
+        stateMachine.SetAvailableStates(new List<State<MyGameStateData>>{
             new EnemyIdleState(),
             new EnemyDefendState(),
             new EnemyAttackState()
         });
+
 
         stateMachine.AddTransition(
             E_EnemyStateMachineStates.Idle,

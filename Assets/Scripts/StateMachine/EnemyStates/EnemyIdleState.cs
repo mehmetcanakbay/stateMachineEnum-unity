@@ -2,21 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyIdleState : State
+public class EnemyIdleState : State<MyGameStateData>
 {
-    public override void OnInitialize(StateDataInjection data)
+    public override void OnInitialize()
     {
     }
 
-    public override void Tick(StateDataInjection data)
+    public override void Tick()
+    {
+        Debug.Log("Idle now...");
+    }
+
+    public override void OnTransitionEnter()
     {
     }
 
-    public override void OnTransitionEnter(StateDataInjection data)
-    {
-    }
-
-    public override void OnTransitionExit(StateDataInjection data)
+    public override void OnTransitionExit()
     {
     }
 }

@@ -5,23 +5,6 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-//well this seems like a bad idea, it probably holds a lot more data than it needs
-//TODO: convert from gameobject to component
-public struct StateDataInjection {
-    public GameObject owner;
-    public GameObject player;
-
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="ownerObj">State owner</param>
-    /// <param name="playerObj">Player reference</param>
-    public StateDataInjection(GameObject ownerObj, GameObject playerObj) {
-        owner = ownerObj;
-        player = playerObj;
-    }
-}
-
 /// <summary>
 /// Struct to send information from the main component to the state easily 
 /// This is transition info, one can create this struct, then push this info to the transition list
@@ -39,12 +22,13 @@ public struct StateTransitionInfo {
     }
 }
 
-public class StateMachine<T> where T : struct
+public class StateMachine<T, F> where T : struct 
+                                where F : IBaseStateData
 {  
     T currentState;
-    StateDataInjection stateDataInjects;
+    F stateData;
     Func<T, int> enumConverter;
-    List<State> availableStates;
+    List<State<F>> availableStates;
     List<StateTransitionInfo> transitions;
 
     //compiler stuff
@@ -71,7 +55,7 @@ public class StateMachine<T> where T : struct
     /// });
     /// </summary>
     /// <param name="overridenStateList"></param>
-    public void SetAvailableStates(List<State> overridenStateList) {
+    public void SetAvailableStates(List<State<F>> overridenStateList) {
         availableStates = overridenStateList;
     }
 
@@ -95,8 +79,9 @@ public class StateMachine<T> where T : struct
     /// Do not forget to call StartMachine and TickMachine in Start and Update functions respectively.
     /// </summary>
     /// <param name="starterState"></param>
-    public StateMachine(T starterState, StateDataInjection data) {
+    public StateMachine(T starterState, F sharedStateData) {
         currentState = starterState;
+        stateData = sharedStateData;
         transitions = new List<StateTransitionInfo>();
 
         //to add int of enums
@@ -109,8 +94,8 @@ public class StateMachine<T> where T : struct
     /// Starts the initialization for available states.
     /// </summary>
     public void StartMachine() {
-        foreach (State state in availableStates) {
-            state.OnInitialize(stateDataInjects);
+        foreach (State<F> state in availableStates) {
+            state.Initialize(stateData);
         }
     }
 
@@ -132,7 +117,7 @@ public class StateMachine<T> where T : struct
 
         //tick the current state
         int currentIndex = enumConverter(currentState);
-        availableStates[currentIndex].Tick(stateDataInjects);
+        availableStates[currentIndex].Tick();
     }
 
     /// <summary>
@@ -141,9 +126,9 @@ public class StateMachine<T> where T : struct
     /// </summary>
     /// <param name="newState">New state to switch state</param>
     private void SwitchStates(T newState) {
-        availableStates[enumConverter(currentState)].OnTransitionExit(stateDataInjects);
+        availableStates[enumConverter(currentState)].OnTransitionExit();
         currentState = newState;
-        availableStates[enumConverter(currentState)].OnTransitionEnter(stateDataInjects);
+        availableStates[enumConverter(currentState)].OnTransitionEnter();
     }
 
 }
