@@ -78,7 +78,8 @@ public class StateMachine<T, F> where T : struct
     /// Do not forget to initialize the states using SetAvailableStates, hierarchy should be the same as the enum.
     /// Do not forget to call StartMachine and TickMachine in Start and Update functions respectively.
     /// </summary>
-    /// <param name="starterState"></param>
+    /// <param name="starterState">state to start with</param>
+    /// <param name="sharedStateData">State data class to be passed around in states</param>
     public StateMachine(T starterState, F sharedStateData) {
         currentState = starterState;
         stateData = sharedStateData;
