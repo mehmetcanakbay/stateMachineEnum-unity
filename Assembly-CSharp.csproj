@@ -38,6 +38,7 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\StateMachine\StateMachine\State.cs" />
      <Compile Include="Assets\StarterFiles\TutorialInfo\Scripts\Readme.cs" />
+     <Compile Include="Assets\Scripts\StateMachine\MyGameStateData.cs" />
      <Compile Include="Assets\Scripts\StateMachine\EnemyBase.cs" />
      <Compile Include="Assets\Scripts\StateMachine\EnemyStates\EnemyDefendState.cs" />
      <Compile Include="Assets\Scripts\SimpleCameraController.cs" />
@@ -45,8 +46,9 @@
      <Compile Include="Assets\Scripts\StateMachine\EnemyStates\EnemyIdleState.cs" />
      <Compile Include="Assets\Scripts\StateMachine\StateMachine\StateMachine.cs" />
      <Compile Include="Assets\Scripts\StateMachine\StateMachine\Interfaces.cs" />
-     <Compile Include="Assets\Scripts\StateMachine\MyGameStateData.cs" />
-     <Compile Include="Assets\Scripts\StateMachine\StateMachine\UnityStateMachine.cs" />
+     <Compile Include="Assets\Scripts\StateMachine\StateMachine\Unity\UnityStateMachineInitializer.cs" />
+     <Compile Include="Assets\Scripts\StateMachine\StateMachine\Unity\UnityStateMachineRunner.cs" />
+     <Compile Include="Assets\Scripts\GameState\GameStateManager.cs" />
      <None Include="Assets\Materials\Skybox Gradient.shader" />
     <Reference Include="UnityEngine">
         <HintPath>C:/Program Files/Unity/Hub/Editor/2020.3.3f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>

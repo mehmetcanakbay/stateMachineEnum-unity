@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MAKStateMachine;
 
 public enum E_EnemyStateMachineStates {
     Idle,
@@ -12,7 +13,7 @@ public class EnemyBase : MonoBehaviour
 {
 
     bool testFlag = false;
-    StateMachine<E_EnemyStateMachineStates, MyGameStateData> stateMachine;
+    UnityStateMachineRunner<E_EnemyStateMachineStates, MyGameStateData> stateMachine;
     // Start is called before the first frame update
     void Start()
     {
@@ -20,7 +21,7 @@ public class EnemyBase : MonoBehaviour
             this.gameObject, new GameObject(), "hello"
         );
         
-        stateMachine = new StateMachine<E_EnemyStateMachineStates, MyGameStateData>(
+        stateMachine = new UnityStateMachineRunner<E_EnemyStateMachineStates, MyGameStateData>(
             E_EnemyStateMachineStates.Idle,
             stateData
         );
@@ -30,7 +31,6 @@ public class EnemyBase : MonoBehaviour
             new EnemyDefendState(),
             new EnemyAttackState()
         });
-
 
         stateMachine.AddTransition(
             E_EnemyStateMachineStates.Idle,
@@ -50,8 +50,6 @@ public class EnemyBase : MonoBehaviour
             ()=>!testFlag
         );
 
-        stateMachine.StartMachine();
-
         StartCoroutine(testingDelay());
     }
 
@@ -65,6 +63,5 @@ public class EnemyBase : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        stateMachine.TickMachine();
     }
 }

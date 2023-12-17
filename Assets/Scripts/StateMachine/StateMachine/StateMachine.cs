@@ -1,135 +1,134 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using UnityEngine;
 
-/// <summary>
-/// Struct to send information from the main component to the state easily 
-/// This is transition info, one can create this struct, then push this info to the transition list
-/// And then this transition starts to get checked, if req is true go into the new state etc...
-/// </summary>
-public struct StateTransitionInfo {
-    public int from;
-    public int to;
-    public Func<bool> req;
-
-    public StateTransitionInfo(int fromref, int toref, Func<bool> reqref) {
-        from = fromref;
-        to = toref;
-        req = reqref;
-    }
-}
-
-public class StateMachine<T, F> where T : struct 
-                                where F : IBaseStateData
-{  
-    T currentState;
-    F stateData;
-    Func<T, int> enumConverter;
-    List<State<F>> availableStates;
-    List<StateTransitionInfo> transitions;
-
-    //compiler stuff
-    private static int Identity(int x) {
-        return x;
-    }
-
+namespace MAKStateMachine {
     /// <summary>
-    /// Get the index of the enum. Used for state function calls
+    /// Struct to send information from the main component to the state easily 
+    /// This is transition info, one can create this struct, then push this info to the transition list
+    /// And then this transition starts to get checked, if req is true go into the new state etc...
     /// </summary>
-    /// <param name="paramEnum">Returns the index of the given enum</param>
-    /// <returns></returns>
-    private int ReturnIndexOfEnum(T paramEnum) {
-        return enumConverter(paramEnum);
-    } 
+    public struct StateTransitionInfo {
+        public int from;
+        public int to;
+        public Func<bool> req;
 
-    /// <summary>
-    /// Initialize all the states, in the same hierarchy as the enum.
-    /// Example: 
-    /// stateMachine.SetAvailableStates(new List<State>{
-    ///    new EnemyIdleState(),
-    ///    new EnemyDefendState(),
-    ///    new EnemyAttackState()
-    /// });
-    /// </summary>
-    /// <param name="overridenStateList"></param>
-    public void SetAvailableStates(List<State<F>> overridenStateList) {
-        availableStates = overridenStateList;
-    }
-
-    /// <summary>
-    /// Add a transition to this state machine object.
-    /// Example: AddTransition(Enum.Idle, Enum.Attack, () => shouldAttack);
-    /// </summary>
-    /// <param name="from">From which state</param>
-    /// <param name="to">To what state</param>
-    /// <param name="requirement">Function reference, it must return boolean. If true, it will continue the transition.</param>
-    public void AddTransition(T from, T to, Func<bool> requirement) {
-        transitions.Add(new StateTransitionInfo(
-            ReturnIndexOfEnum(from), ReturnIndexOfEnum(to), requirement
-        ));
-    }
-
-    /// <summary>
-    /// Initialize a state machine. 
-    /// After initializing, do not forget these two important steps
-    /// Do not forget to initialize the states using SetAvailableStates, hierarchy should be the same as the enum.
-    /// Do not forget to call StartMachine and TickMachine in Start and Update functions respectively.
-    /// </summary>
-    /// <param name="starterState">state to start with</param>
-    /// <param name="sharedStateData">State data class to be passed around in states</param>
-    public StateMachine(T starterState, F sharedStateData) {
-        currentState = starterState;
-        stateData = sharedStateData;
-        transitions = new List<StateTransitionInfo>();
-
-        //to add int of enums
-        //credits to @thefuntastic's state machine repo
-        Func<int, int> identity = Identity;
-        enumConverter = Delegate.CreateDelegate(typeof(Func<T, int>), identity.Method) as Func<T, int>;
-    }
-    
-    /// <summary>
-    /// Starts the initialization for available states.
-    /// </summary>
-    public void StartMachine() {
-        foreach (State<F> state in availableStates) {
-            state.Initialize(stateData);
+        public StateTransitionInfo(int fromref, int toref, Func<bool> reqref) {
+            from = fromref;
+            to = toref;
+            req = reqref;
         }
     }
 
-    /// <summary>
-    /// Start ticking the machine.
-    /// </summary>
-    public void TickMachine() {
-        foreach (StateTransitionInfo inform in transitions) {
-            //if the transition isnt from this state, then no point in checking
-            if (inform.from != ReturnIndexOfEnum(currentState)) {
-                continue;
-            }
+    public class StateMachine<T, F> where T : struct 
+                                    where F : IBaseStateData
+    {  
+        T currentState;
+        F stateData;
+        Func<T, int> enumConverter;
+        List<State<F>> availableStates;
+        List<StateTransitionInfo> transitions;
 
-            //if the transition is from this state, then check the requirement
-            if (inform.req()) {
-                SwitchStates((T)Enum.ToObject(typeof(T), inform.to));
+        //compiler stuff
+        private static int Identity(int x) {
+            return x;
+        }
+
+        /// <summary>
+        /// Get the index of the enum. Used for state function calls
+        /// </summary>
+        /// <param name="paramEnum">Returns the index of the given enum</param>
+        /// <returns>return the index of the enum</returns>
+        private int ReturnIndexOfEnum(T paramEnum) {
+            return enumConverter(paramEnum);
+        } 
+
+        /// <summary>
+        /// Initialize all the states, in the same hierarchy as the enum.
+        /// Example: 
+        /// stateMachine.SetAvailableStates(new List<State>{
+        ///    new EnemyIdleState(),
+        ///    new EnemyDefendState(),
+        ///    new EnemyAttackState()
+        /// });
+        /// </summary>
+        /// <param name="overridenStateList"></param>
+        public void SetAvailableStates(List<State<F>> overridenStateList) {
+            availableStates = overridenStateList;
+        }
+
+        /// <summary>
+        /// Add a transition to this state machine object.
+        /// Example: AddTransition(Enum.Idle, Enum.Attack, () => shouldAttack);
+        /// </summary>
+        /// <param name="from">From which state</param>
+        /// <param name="to">To what state</param>
+        /// <param name="requirement">Function reference, it must return boolean. If true, it will continue the transition.</param>
+        public void AddTransition(T from, T to, Func<bool> requirement) {
+            transitions.Add(new StateTransitionInfo(
+                ReturnIndexOfEnum(from), ReturnIndexOfEnum(to), requirement
+            ));
+        }
+
+        /// <summary>
+        /// Initialize a state machine. 
+        /// After initializing, do not forget these two important steps
+        /// Do not forget to initialize the states using SetAvailableStates, hierarchy should be the same as the enum.
+        /// Do not forget to call StartMachine and TickMachine in Start and Update functions respectively.
+        /// </summary>
+        /// <param name="starterState">state to start with</param>
+        /// <param name="sharedStateData">State data class to be passed around in states</param>
+        public StateMachine(T starterState, F sharedStateData) {
+            currentState = starterState;
+            stateData = sharedStateData;
+            transitions = new List<StateTransitionInfo>();
+
+            //to add int of enums
+            //credits to @thefuntastic's state machine repo
+            Func<int, int> identity = Identity;
+            enumConverter = Delegate.CreateDelegate(typeof(Func<T, int>), identity.Method) as Func<T, int>;
+        }
+        
+        /// <summary>
+        /// Starts the initialization for available states.
+        /// </summary>
+        public void StartMachine() {
+            foreach (State<F> state in availableStates) {
+                state.Initialize(stateData);
             }
         }
 
-        //tick the current state
-        int currentIndex = enumConverter(currentState);
-        availableStates[currentIndex].Tick();
-    }
+        /// <summary>
+        /// Start ticking the machine.
+        /// </summary>
+        public void TickMachine() {
+            foreach (StateTransitionInfo inform in transitions) {
+                //if the transition isnt from this state, then no point in checking
+                if (inform.from != ReturnIndexOfEnum(currentState)) {
+                    continue;
+                }
 
-    /// <summary>
-    /// Switch the state to another state, and call the transition enter and exit functions.
-    /// This is private and user should not be able to touch this.
-    /// </summary>
-    /// <param name="newState">New state to switch state</param>
-    private void SwitchStates(T newState) {
-        availableStates[enumConverter(currentState)].OnTransitionExit();
-        currentState = newState;
-        availableStates[enumConverter(currentState)].OnTransitionEnter();
+                //if the transition is from this state, then check the requirement
+                if (inform.req()) {
+                    SwitchStates((T)Enum.ToObject(typeof(T), inform.to));
+                }
+            }
+
+            //tick the current state
+            int currentIndex = enumConverter(currentState);
+            availableStates[currentIndex].Tick();
+        }
+
+        /// <summary>
+        /// Switch the state to another state, and call the transition enter and exit functions.
+        /// This is private and user should not be able to touch this.
+        /// </summary>
+        /// <param name="newState">New state to switch state</param>
+        private void SwitchStates(T newState) {
+            availableStates[enumConverter(currentState)].OnTransitionExit();
+            currentState = newState;
+            availableStates[enumConverter(currentState)].OnTransitionEnter();
+        }
+
     }
 
 }
