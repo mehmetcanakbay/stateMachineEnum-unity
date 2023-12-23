@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MAKStateMachine;
 
-public class EnemyIdleState : State<MyGameStateData>
+public class EnemyIdleState : State<SimpleEnemyStateData>
 {
     public override void OnInitialize()
     {
@@ -11,7 +11,6 @@ public class EnemyIdleState : State<MyGameStateData>
 
     public override void Tick()
     {
-        Debug.Log("Idle now...");
     }
 
     public override void OnTransitionEnter()

@@ -120,13 +120,26 @@ namespace MAKStateMachine {
 
         /// <summary>
         /// Switch the state to another state, and call the transition enter and exit functions.
-        /// This is private and user should not be able to touch this.
         /// </summary>
         /// <param name="newState">New state to switch state</param>
-        private void SwitchStates(T newState) {
+        public void SwitchStates(T newState) {
             availableStates[enumConverter(currentState)].OnTransitionExit();
             currentState = newState;
             availableStates[enumConverter(currentState)].OnTransitionEnter();
+        }
+
+        public T ReturnCurrentState() {
+            return currentState;
+        }
+
+        /// <summary>
+        /// CAUTION!! 
+        /// This re-intializes all states.
+        /// </summary>
+        /// <param name="newData">New state data.</param>
+        public void RenewStateData(F newData) {
+            stateData = newData;
+            StartMachine();
         }
 
     }

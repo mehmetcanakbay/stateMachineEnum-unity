@@ -5,59 +5,62 @@ using MAKStateMachine;
 
 public enum E_EnemyStateMachineStates {
     Idle,
+    Ultimate,
     Defend,
-    Attack
+    Attack,
+    Any
 }
 
 public class EnemyBase : MonoBehaviour
 {
 
-    bool testFlag = false;
-    UnityStateMachineRunner<E_EnemyStateMachineStates, MyGameStateData> stateMachine;
+    UnityStateMachineRunner<E_EnemyStateMachineStates, SimpleEnemyStateData> stateMachine;
+    [SerializeField]
+    private int ultimateDamage = -2;
     // Start is called before the first frame update
     void Start()
     {
-        var stateData = new MyGameStateData(
-            this.gameObject, new GameObject(), "hello"
+        var stateData = new SimpleEnemyStateData(
+            this, GameManager.Instance.Player.GetComponent<PlayerManager>()
         );
         
-        stateMachine = new UnityStateMachineRunner<E_EnemyStateMachineStates, MyGameStateData>(
-            E_EnemyStateMachineStates.Idle,
+        stateMachine = new UnityStateMachineRunner<E_EnemyStateMachineStates, SimpleEnemyStateData>(
+            E_EnemyStateMachineStates.Attack,
             stateData
         );
 
-        stateMachine.SetAvailableStates(new List<State<MyGameStateData>>{
+        stateMachine.SetAvailableStates(new List<State<SimpleEnemyStateData>>{
             new EnemyIdleState(),
+            new EnemyUltimateState(ultimateDamage),
             new EnemyDefendState(),
-            new EnemyAttackState()
+            new EnemyAttackState(),
+            new EnemyAnyState()
         });
-
-        stateMachine.AddTransition(
-            E_EnemyStateMachineStates.Idle,
-            E_EnemyStateMachineStates.Defend, 
-            ()=>testFlag
-        );
-
-        stateMachine.AddTransition(
-            E_EnemyStateMachineStates.Defend,
-            E_EnemyStateMachineStates.Attack, 
-            ()=>true
-        );
-
+        
+        
         stateMachine.AddTransition(
             E_EnemyStateMachineStates.Attack,
-            E_EnemyStateMachineStates.Idle, 
-            ()=>!testFlag
+            E_EnemyStateMachineStates.Ultimate, 
+            CanDoUltimate
         );
-
-        StartCoroutine(testingDelay());
     }
 
-    IEnumerator testingDelay() {
-        yield return new WaitForSeconds(5.0f);
-        testFlag = true;
-        yield return new WaitForSeconds(2.0f);
-        testFlag = false;
+    public bool CanDoUltimate() {
+        if (GameManager.Instance != null) {
+            if (GameManager.Instance.ReturnCurrentEnemyMana() >= 7) {
+                // Debug.Log("Doing ultimate attack!!");
+                //Attack player here
+                return true;
+            }   
+            else {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    public void ChangeState(E_EnemyStateMachineStates state) {
+        stateMachine.TransitionToThisStateNow(state);
     }
 
     // Update is called once per frame

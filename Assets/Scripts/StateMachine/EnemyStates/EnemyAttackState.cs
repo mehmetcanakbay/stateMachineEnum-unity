@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MAKStateMachine;
 
-public class EnemyAttackState : State<MyGameStateData>
+public class EnemyAttackState : State<SimpleEnemyStateData>
 {
     public override void OnInitialize()
     {
@@ -11,11 +11,11 @@ public class EnemyAttackState : State<MyGameStateData>
 
     public override void Tick()
     {
-        Debug.Log("Attacking now!!");
     }
 
     public override void OnTransitionEnter()
     {
+        stateData.playerManager.AddToPlayerHealth(-1);
     }
 
     public override void OnTransitionExit()

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MAKStateMachine;
 
-public class EnemyDefendState : State<MyGameStateData>
+public class EnemyDefendState : State<SimpleEnemyStateData>
 {
     public override void OnInitialize()
     {
