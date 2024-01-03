@@ -5,8 +5,8 @@ using MAKStateMachine;
 using System;
 
 namespace MAKStateMachine {
-    public class UnityStateMachineRunner<T, F>: IInitializable, ITickable  where T : System.Enum 
-                                                                            where F : IBaseStateData   {
+    public class UnityStateMachineRunner<T, F>  where T : System.Enum 
+                                                where F : IBaseStateData   {
         private StateMachine<T,F> stateMachine;
 
         private bool shouldTick = true;
