@@ -19,7 +19,7 @@ namespace MAKStateMachine {
         }
     }
 
-    public class StateMachine<T, F> where T : struct 
+    public class StateMachine<T, F> where T : System.Enum 
                                     where F : IBaseStateData
     {  
         T currentState;

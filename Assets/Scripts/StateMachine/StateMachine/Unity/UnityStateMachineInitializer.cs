@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace MAKStateMachine {
     public class UnityStateMachineInitializer : MonoBehaviour {
-        /*
+        
         public static UnityStateMachineInitializer Instance;
         [HideInInspector]
         public UnityEvent startEvent;
@@ -18,36 +18,53 @@ namespace MAKStateMachine {
         private void Awake() {
             Instance = this;
         }
-        */
+        
 
         private List<ITickable> tickableList;
         private List<IInitializable> initializableList;
         
         private void Start() {
-            // startEvent.Invoke();
+            startEvent.Invoke();
+            //Reflection test
+            /*
             tickableList = new List<ITickable>();
-            var tickableTypes = GetClassesImplementingInterface<ITickable>();
+            List<Type> tickableTypes = GetClassesImplementingInterface<ITickable>();
             
-            foreach(var tickable in tickableTypes) {
-                tickableList.Add((ITickable)Activator.CreateInstance(tickable));
+            foreach(Type tickable in tickableTypes) {
+                if (tickable.IsGenericType) { //this probably needs more queries 
+                    Type testtypes = tickable.GetGenericArguments()[0];
+                    Debug.Log(testtypes);
+
+                    var genericType = tickable.MakeGenericType(new Type[] {typeof(System.Enum), typeof(IBaseStateData)});
+                    tickableList.Add((ITickable)Activator.CreateInstance(genericType));
+
+                } else {
+                    tickableList.Add((ITickable)Activator.CreateInstance(tickable));
+                }
             }
 
-            initializableList = new List<IInitializable>();
-            var initializableTypes = GetClassesImplementingInterface<IInitializable>();
+            //////////////
+
+            // initializableList = new List<IInitializable>();
+            // var initializableTypes = GetClassesImplementingInterface<IInitializable>();
             
-            foreach(var tickable in initializableTypes) {
-                IInitializable doesImplement = (IInitializable)Activator.CreateInstance(tickable);
-                doesImplement.Initialize();
-                initializableList.Add(doesImplement);
+            // foreach(var initializable in initializableTypes) {
+            //     IInitializable doesImplement = (IInitializable)Activator.CreateInstance(initializable);
+            //     doesImplement.Initialize();
+            //     initializableList.Add(doesImplement);
                 
-            }  
+            // }  
+            */
         }
 
         private void Update() {
-            // updateEvent.Invoke();
+            updateEvent.Invoke();
+            //Reflection test
+            /*
             foreach (var tickable in tickableList) {
                 tickable.Tick();
             }
+            */
         }
 
         private List<Type> GetClassesImplementingInterface<T>() {

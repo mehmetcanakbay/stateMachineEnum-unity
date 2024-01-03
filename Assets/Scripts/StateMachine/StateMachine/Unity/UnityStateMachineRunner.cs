@@ -5,8 +5,8 @@ using MAKStateMachine;
 using System;
 
 namespace MAKStateMachine {
-    public class UnityStateMachineRunner<T, F>  where T : struct 
-                                                 where F : IBaseStateData   {
+    public class UnityStateMachineRunner<T, F>: IInitializable, ITickable  where T : System.Enum 
+                                                                            where F : IBaseStateData   {
         private StateMachine<T,F> stateMachine;
 
         private bool shouldTick = true;
@@ -18,10 +18,9 @@ namespace MAKStateMachine {
         }
 
         public void SetAvailableStates(List<State<F>> overridenStateList) {
-            BindToEngine();
-
             stateMachine.SetAvailableStates(overridenStateList);
-            CustomStart();
+            BindToEngine();
+            Initialize();
         }
 
         public void AddTransition(T from, T to, Func<bool> requirement) {
@@ -35,36 +34,27 @@ namespace MAKStateMachine {
         }
 
         bool BindToEngine() {
-            /*
+            
             if (UnityStateMachineInitializer.Instance != null) {
                 //I think start event is not working...
                 // UnityStateMachineInitializer.Instance.startEvent.AddListener(CustomStart);
-                UnityStateMachineInitializer.Instance.updateEvent.AddListener(CustomUpdate);
+                UnityStateMachineInitializer.Instance.updateEvent.AddListener(Tick);
                 return true;
             } else {
                 Debug.LogWarning("Initializer does not exist!! Did you forget to add UnityStateMachineInitializer component to your scene?");
                 return false;
             }
-            */
-            return false;
         }
 
         public void Tick() {
-            CustomUpdate();
-        }
-
-        public void Initalize() {
-            CustomStart();
-        }
-
-        void CustomStart() {
-            stateMachine.StartMachine();
-        }
-
-        void CustomUpdate() {
             if (shouldTick) {
                 stateMachine.TickMachine();
+                Debug.Log("ticking");
             }
+        }
+
+        public void Initialize() {
+            stateMachine.StartMachine();
         }
 
         public void StopTicking() {
