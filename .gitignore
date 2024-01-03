@@ -2,7 +2,8 @@ Thumbs.db
 Desktop.ini
 .DS_Store
 *.swp
-
+.vscode
+/obj
 /Library
 /Logs
 /Recordings
